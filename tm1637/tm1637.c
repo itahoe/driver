@@ -5,9 +5,12 @@
   */
 
 
+#include <ctype.h>
 #include "stm32.h"
 #include "tm1637.h"
+//#include "tm1637_x_i2c.h"
 
+extern  const   uint8_t tm1637_x_addr[TM1637_CHNL_MAX];
 
 /*******************************************************************************
 * PRIVATE DEFINES
@@ -16,6 +19,7 @@
 #define TM1637_CMD_WRITE_AUTO   0x02
 #define TM1637_CMD_READ         0x62
 #define TM1637_CMD_READ_AUTO    0x42
+
 
 /*******************************************************************************
 * PRIVATE CONSTANTS
@@ -46,7 +50,7 @@ tm1637_init( void )
 void
 tm1637_display_clear( void )
 {
-    tm1637_display_fill( ENC_NONE );
+    tm1637_display_fill( ENC_BLANK );
 }
 
 
@@ -96,14 +100,41 @@ tm1637_set_digit(                   const   tm1637_addr_t   addr,
   * @retval None
   */
 void
-tm1637_string(                          char *      str,
-                                        size_t      len )
-{
-    //tm1637_x_write_byte( 1, 1, d );
-}
-
-void
 tm1637_write_string(                    char *              s )
 {
+    uint8_t     symb[ TM1637_CHNL_MAX ];
+    size_t      cnt;
 
+
+    for( cnt = 0; cnt < TM1637_CHNL_MAX; cnt++ )
+    {
+        if( *s == NULL )
+        {
+            break;
+        }
+
+        if( isdigit( *s ) )
+        {
+            symb[cnt]    = encode[ (*s-'0') & 0xF ];
+
+            if( *(++s) == '.' )
+            {
+                symb[cnt]   |= SEG_H;
+                s++;
+            }
+        }
+        else if( isspace( *s ) )
+        {
+            symb[cnt]    = ENC_BLANK;
+            s++;
+        }
+
+    }
+
+    for( int i = 0; i < cnt; i++ )
+    {
+        tm1637_x_write_byte( 1, 1, TM1637_CMD_WRITE );
+        tm1637_x_write_byte( 1, 0, tm1637_x_addr[i] );
+        tm1637_x_write_byte( 0, 1, symb[i]  );
+    }
 }

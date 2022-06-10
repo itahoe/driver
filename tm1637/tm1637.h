@@ -19,6 +19,8 @@
 * - TM1637 IF provides a different bits order, LSB first (unlike MSB in I2C)
 *******************************************************************************/
 
+#define TM1637_CHNL_MAX         6
+
 
 typedef enum    tm1637_brightness_e
 {
@@ -71,17 +73,20 @@ typedef enum    tm1637_addr_e
 #define ENC_F                   (SEG_A|SEG_E|SEG_F|SEG_G)
 #define ENC_MINUS               (SEG_G)
 #define ENC_POINT               (SEG_H)
-#define ENC_NONE                (0)
+#define ENC_BLANK               (0)
 #define ENC_ALL                 (SEG_A|SEG_B|SEG_C|SEG_D|SEG_E|SEG_F|SEG_G|SEG_H)
 
 #define TM1637_ENC_TBL16_1      { ENC_0, ENC_1, ENC_2, ENC_3, ENC_4, ENC_5, ENC_6, ENC_7, ENC_8, ENC_9, ENC_A, ENC_B, ENC_C, ENC_D, ENC_E, ENC_F, }
-#define TM1637_ENC_TBL16_2      { ENC_0, ENC_1, ENC_2, ENC_3, ENC_4, ENC_5, ENC_6, ENC_7, ENC_8, ENC_9, ENC_MINUS, ENC_NONE, ENC_NONE, ENC_NONE, ENC_NONE, ENC_NONE, }
+#define TM1637_ENC_TBL16_2      { ENC_0, ENC_1, ENC_2, ENC_3, ENC_4, ENC_5, ENC_6, ENC_7, ENC_8, ENC_9, ENC_MINUS, ENC_BLANK, ENC_BLANK, ENC_BLANK, ENC_BLANK, ENC_BLANK, }
 
 #define TM1637_ENC_TBL16        TM1637_ENC_TBL16_2
 
 /*******************************************************************************
 * FUNCTIONS PROTOTYPE
 *******************************************************************************/
+void    tm1637_x_stop_cond( void );
+int     tm1637_x_write_byte( int, int, uint8_t );
+
 void    tm1637_init( void );
 void    tm1637_display_clear( void );
 void    tm1637_display_fill( uint8_t );
@@ -89,9 +94,6 @@ void    tm1637_set_brightness( tm1637_brightness_t );
 void    tm1637_set_digit( const tm1637_addr_t, const uint8_t );
 
 void    tm1637_write_string( char * );
-
-void    tm1637_x_stop_cond( void );
-int     tm1637_x_write_byte( int, int, uint8_t );
 
 
 #endif	// TM1637_H
